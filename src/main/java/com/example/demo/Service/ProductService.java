@@ -48,13 +48,8 @@ public class ProductService {
     public Product getProductByIdAndBusinessName(Long id,String businessName){
         return productRepository.findByIdAndBusinessName(id,businessName);
     }
-    public String deleteProduct(long id){
-
-        try{productRepository.deleteById(id);}
-        catch(Exception e){
-            return "failure";
-        }
-        return "success";
+    public void deleteProduct(long id){
+        productRepository.deleteById(id);
     }
     public List<Product> getAllProductsByBusinessName(String businessName){
         return productRepository.findAllByBusinessName(businessName);

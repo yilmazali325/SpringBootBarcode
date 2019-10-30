@@ -41,10 +41,14 @@ public class UserController {
     public List<User> getLocalUsers(@RequestParam String role, @RequestParam String businessName){
         return userService.getLocalUsers(role,businessName);
     }
+    @GetMapping("/admin/local/id")
+    public User getLocalForAdmin(@RequestParam long id, @RequestParam String businessName, @RequestParam String role){
+        return userService.getLocalForAdmin(id,businessName,role);
+    }
 
     @GetMapping("/local/id")
-    public User getLocalUserById(@RequestParam long id, @RequestParam String businessName){
-        return userService.getLocalUserById(id,businessName);
+    public User getLocalUserById(@RequestParam long id, @RequestParam String role){
+        return userService.getLocalUserById(id,role);
     }
 
     @GetMapping("/business/id")
@@ -68,15 +72,24 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody User user){
-        String response = userService.saveUser(user);
-        return response;
+    public void registerUser(@RequestBody User user){
+       userService.saveUser(user);
     }
 
     @PutMapping("/update")
     public void updateUser(@RequestBody User user){
         userService.updateUser(user);
 
+    }
+
+    @DeleteMapping("/deletelocal")
+    public void deleteLocalUser(@RequestParam long id, @RequestParam String role, @RequestParam String businessName){
+        userService.deleteLocalUser(id,role,businessName);
+    }
+
+    @DeleteMapping("/deletebusiness")
+    public void deleteBusinessUser(@RequestParam long id, @RequestParam String role){
+        userService.deleteBusinessUser(id,role);
     }
 
     @DeleteMapping("/delete")

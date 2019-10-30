@@ -5,6 +5,8 @@ import com.example.demo.Dto.ResponseInt;
 import com.example.demo.Entity.Product;
 import com.example.demo.Exception.ProductNotFoundException;
 import com.example.demo.Service.ProductService;
+import com.example.demo.Util.ErrorObj;
+import com.example.demo.Util.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,9 +47,16 @@ public class ProductController {
     }
 
     @PostMapping
-    public String addProduct(@RequestBody Product product){
-        productService.saveProduct(product);
-        return "Succesfully saved!";
+    public ResponseEntity<?> addProduct(@RequestBody Product product){
+           try{
+
+           }catch(Exception ex){
+               System.out.println("Error product quantity should be integer");
+               ErrorObj errorObj = ErrorResponse.errorResponse("Error product quantity should be integer",ex.getMessage(),"400");
+               return new ResponseEntity<>(errorObj,HttpStatus.BAD_REQUEST);
+           }
+
+        return new ResponseEntity<>(productService.saveProduct(product),HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/checkout")
@@ -73,8 +82,14 @@ public class ProductController {
     }
 
     @DeleteMapping
-    public String deleteProduct(@RequestParam long id){
-        String message = productService.deleteProduct(id);
-        return message;
+    public void deleteProduct(@RequestParam long id){
+        try {
+            productService.deleteProduct(id);
+        }
+        catch(Exception ex){
+            System.out.println(ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
+        }
     }
+
 }

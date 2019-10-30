@@ -14,9 +14,12 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public String saveUser(User user){
-        userRepository.save(user);
-        return "success";
+    public void saveUser(User user){ ;
+        if(userRepository.findUserByEmail(user.getEmail()) == null) {
+            userRepository.save(user);
+        }else{
+            throw new RuntimeException("User with that email already exists!");
+        }
     }
 
     public User loginUser(User user){
@@ -40,18 +43,38 @@ public class UserService {
         return userRepository.findAll();
     }
     public void updateUser(User user){
-        User userToBeProcessed = userRepository.findById(user.getId()).get();
-        userToBeProcessed.setEmail(user.getEmail());
-        userToBeProcessed.setPassword(user.getPassword());
-        userToBeProcessed.setFirstName(user.getFirstName());
-        userToBeProcessed.setLastName(user.getLastName());
-        userToBeProcessed.setRole(user.getRole());
-        userToBeProcessed.setBusinessBoolean(user.isBusinessBoolean());
-        userToBeProcessed.setBusinessName(user.getBusinessName());
-        userToBeProcessed.setAccountDisabledStatus(user.isAccountDisabledStatus());
-        userRepository.save(userToBeProcessed);
+        if(userRepository.findUserByEmail(user.getEmail()) == null) {
+            User userToBeProcessed = userRepository.findById(user.getId()).get();
+            userToBeProcessed.setEmail(user.getEmail());
+            userToBeProcessed.setPassword(user.getPassword());
+            userToBeProcessed.setFirstName(user.getFirstName());
+            userToBeProcessed.setLastName(user.getLastName());
+            userToBeProcessed.setRole(user.getRole());
+            userToBeProcessed.setBusinessBoolean(user.isBusinessBoolean());
+            userToBeProcessed.setBusinessName(user.getBusinessName());
+            userToBeProcessed.setAccountDisabledStatus(user.isAccountDisabledStatus());
+            userRepository.save(userToBeProcessed);
+        }else{
+            throw new RuntimeException("User with that email already exists!");
+        }
+
     }
     public void deleteUser(long id){
+        if(userRepository.findById(id).get() == null){
+            throw new RuntimeException("User with given id does not exist!");
+        }
+        userRepository.deleteById(id);
+    }
+    public void deleteLocalUser(long id,String role,String businessName)  {
+        if(userRepository.findById(id).get() == null){
+            throw new RuntimeException("User with given id does not exist!");
+        }
+        userRepository.deleteUserByIdAndBusinessNameAndRole(id,businessName,role);
+    }
+    public void deleteBusinessUser(long id,String role){
+        if(userRepository.findById(id).get() == null && role.equals("admin")){
+            throw new RuntimeException("User with given id does not exist!");
+        }
         userRepository.deleteById(id);
     }
     public List<User> getBusinessOwners(){
@@ -67,8 +90,11 @@ public class UserService {
     public List<User> getLocalUsers(String role, String businessName){
         return userRepository.findUsersByBusinessBooleanIsFalseAndRoleAndBusinessName(role,businessName);
     }
-    public User getLocalUserById(long id,String businessName){
-        return userRepository.findUserByIdAndBusinessBooleanIsFalseAndBusinessName(id,businessName);
+    public User getLocalForAdmin(long id, String businessName,String role){
+        return userRepository.findUserByIdAndBusinessNameAndRole(id,businessName,role);
+    }
+    public User getLocalUserById(long id,String role){
+        return userRepository.findUsersByIdAndRole(id,role);
     }
     public User getBusinessUserById(long id){
         return userRepository.findUserByIdAndBusinessBooleanIsTrue(id);

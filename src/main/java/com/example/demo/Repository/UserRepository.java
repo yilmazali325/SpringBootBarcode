@@ -12,8 +12,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findUserByEmail(String email);
     List<User> findUsersByBusinessBooleanIsTrue();
     List<User> findUsersByBusinessBooleanIsFalseAndRoleAndBusinessName(String role, String businessName);
+    User findUserByIdAndBusinessNameAndRole(long id,String businessName,String role);
     @Query("SELECT t FROM User t WHERE t.role='local'")
     List<User> findUsersByRole();
     User findUserByIdAndBusinessBooleanIsTrue(long id);
-    User findUserByIdAndBusinessBooleanIsFalseAndBusinessName(long id, String businessName);
+    User deleteUserByIdAndBusinessNameAndRole(long id,String businessName,String role);
+    User findUsersByIdAndRole(long id, String role);
 }
